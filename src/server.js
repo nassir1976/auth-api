@@ -9,6 +9,7 @@ const logger = require('./auth/middleware/logger.js');
 
 const authRoutes = require('./auth/routes/routes.js');
 const v1Routes = require('./auth/routes/v1.js');
+const v2Routes = require('./auth/routes/v2.js');
 
 //app level middleware
 const app = express();
@@ -23,6 +24,8 @@ app.use(morgan())
 // Routes
 app.use('/api/v1', v1Routes);
 app.use(authRoutes);
+app.use('/api/v2', v2Routes);
+
 
 // Catchalls
 app.use('*', notFoundHandler);

@@ -1,14 +1,16 @@
 'use strict';
 
-const fs = require('fs');
 const express = require('express');
+const authRouter = express.Router();
 const Collection = require('../models/data-collection.js');
+
 const User = require('../models/users.js');
-const router = express.Router();
+
+const fs = require('fs');
 
 const models = new Map();
 
-router.param('model', (req, res, next) => {
+authRouter.param('model', (req, res, next) => {
   const modelName = req.params.model;
   if (models.has(modelName)) {
     req.model = models.get(modelName);
@@ -27,11 +29,19 @@ router.param('model', (req, res, next) => {
   }
 });
 
-router.get('/:model', handleGetAll);
-router.get('/:model/:id', handleGetOne);
-router.post('/:model', handleCreate);
-router.put('/:model/:id', handleUpdate);
-router.delete('/:model/:id', handleDelete);
+const bearerAuth = require('../middleware/bearer.js')
+const permissions = require('../middleware/acl.js')
+
+
+authRouter.get('/:model', bearerAuth, permissions('read'), handleGetAll);
+authRouter.get('/:model/:id', bearerAuth, permissions('read'), handleGetOne);
+authRouter.post('/:model', bearerAuth, permissions('create'), handleCreate);
+authRouter.put('/:model/:id', bearerAuth, permissions('update'), handleUpdate);
+authRouter.patch('/:model/:id', bearerAuth, permissions('update'), handleUpdate);
+authRouter.delete('/:model/:id', bearerAuth, permissions('delete'), handleDelete);
+
+
+
 
 async function handleGetAll(req, res) {
   let allRecords = await req.model.get();
@@ -64,4 +74,4 @@ async function handleDelete(req, res) {
 }
 
 
-module.exports = router;
+module.exports = authRouter;
