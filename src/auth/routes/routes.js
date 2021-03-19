@@ -22,6 +22,7 @@ authRouter.post('/signup', async (req, res, next) => {
   }
 });
 
+
 authRouter.post('/signin', basicAuth, (req, res, next) => {
   const user = {
     user: req.user,
@@ -30,11 +31,12 @@ authRouter.post('/signin', basicAuth, (req, res, next) => {
   res.status(200).json(user);
 });
 
-authRouter.get('/users', bearerAuth, permissions('delete'), async (req, res, next) => {
+authRouter.get('/users', bearerAuth,permissions('delete'), async (req, res, next) => {
   const users = await User.find({});
   const list = users.map(user => user.username);
   res.status(200).json(list);
 });
+
 
 authRouter.get('/secret', bearerAuth, async (req, res, next) => {
   res.status(200).send('Welcome to the secret area')
